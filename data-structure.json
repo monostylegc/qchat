@@ -1,0 +1,40 @@
+{
+    "users" : {
+        "USERID1":{
+            "name":"Danny",
+            "email": "test@naver.com",
+            "online":true
+        },
+        "USERID2":{
+            "name":"Ronnie",
+            "email": "test2@naver.com",
+            "online":true
+        }  
+    },
+    "chats" :{
+        "USERID1":{
+            "USERID2":{
+                "MESSAGEID1":{
+                    "text" : "Suck",
+                    "from" : "them"
+                },
+                "MESSAGEID2":{
+                    "text" : "Fuck",
+                    "from" : "me"
+                }
+            }
+        },
+         "USERID2":{
+            "USERID1":{
+                "MESSAGEID1":{
+                    "text" : "good",
+                    "from" : "me"
+                },
+                "MESSAGEID2":{
+                    "text" : "not goot",
+                    "from" : "them"
+                }
+            }
+        }
+    }
+}
