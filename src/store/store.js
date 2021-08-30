@@ -1,4 +1,4 @@
-import firebase  from 'boot/firebase';
+import { signupWithEmail } from "src/boot/boot";
 
 const state = {
 
@@ -11,10 +11,7 @@ const mutations = {
 const actions = {
     registerUser({},payload){
         console.log('hello',  payload);
-        firebase.auth()
-        .createUseWithEmailAndPassword(payload.email,payload.password)
-        .then(response=>{console.log(response)})
-        .catch(err=>{console.log(err)});
+        signupWithEmail({email:payload.email,password:payload.password});
     }
 }
 
