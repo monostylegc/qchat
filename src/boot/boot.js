@@ -1,7 +1,8 @@
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app"
 import { getAuth } from 'firebase/auth';
-import { createUserWithEmailAndPassword } from '@firebase/auth';
+import { getDatabase } from 'firebase/database'
+
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
@@ -18,20 +19,11 @@ const firebaseConfig = {
 const firebaseApp = initializeApp( firebaseConfig );
 
 const auth = getAuth(firebaseApp);
+const db = getDatabase(firebaseApp);
 
-async function signupWithEmail(data){
-  console.log('UserService.signupWithEmail()');
-    createUserWithEmailAndPassword(auth, data.email, data.password)
-      .then((credential) => {
-        const user = credential.user;
-        console.log(user);
-      })
-      .catch((error) => {
-        console.error('Error ', error.message);
-      });
-}
 
-export { auth, signupWithEmail }
+
+export { auth, db  }
 
 
 

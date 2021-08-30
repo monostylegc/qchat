@@ -43,10 +43,10 @@ export default {
     };
   },
   methods: {
-    ...mapActions("store", ["registerUser"]),
+    ...mapActions("store", ["registerUser", "loginUser"]),
     submitForm() {
       if (this.tab == "login") {
-        console.log("로그인");
+        this.loginUser(this.formData);
       } else if (this.tab == "register") {
         this.registerUser(this.formData);
       }
