@@ -1,12 +1,14 @@
 import { auth, db } from 'boot/boot';
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged,signOut } from 'firebase/auth';
-import { set, ref, onValue, update, onChildAdded, onChildChanged } from 'firebase/database';
+import { set, ref, onValue, update, onChildAdded, onChildChanged, off, push } from 'firebase/database';
 import Vue from 'vue';
 
+let messagesRef;
 
 const state = {
     userDetails : {},
-    users:{}
+    users: {},
+    messages: {},
 }
 
 const mutations = {
@@ -18,6 +20,12 @@ const mutations = {
     },
     updateUser(state, payload){
         Object.assign(state.users[payload.userID], payload.userDetails)
+    },
+    addMessages(state, payload){
+        Vue.set(state.messages, payload.messageID, payload.messageDetails)
+    },
+    clearMessages(state){
+        state.messages = {}
     }
 }
 
@@ -43,15 +51,17 @@ const actions = {
     async loginUser({}, payload){
         signInWithEmailAndPassword(auth, payload.email, payload.password)
         .then((resp)=>{
-            
+            console.log(resp);
         })
         .catch((err)=>{
             console.log(err.message);
         }) 
     },
+
     logoutUser(){
         signOut(auth);
     },
+
     handleAuthStateChange({ commit, dispatch, state }){
         onAuthStateChanged(auth, user=>{
             if(user)
@@ -75,15 +85,15 @@ const actions = {
                 dispatch('firebaseGetUser');
                 this.$router.push('/');
             }
-            else{
-                 dispatch('firebaseUpdateUser',{
+            else {
+                dispatch('firebaseUpdateUser',{
                     userID : state.userDetails.userID,
                     updates: {
                         online : false
                     }
                 });
                 commit('setUserDetails', {});
-               
+                
                 this.$router.replace('/auth');
             }
         });
@@ -111,6 +121,33 @@ const actions = {
                 userdetail
             })
         });
+    },
+
+    firebaseGetMessages({ commit, state }, otherUserID){
+        let userID = state.userDetails.userID;
+        messagesRef =ref(db, 'chats/'+userID+'/'+otherUserID);
+        onChildAdded(messagesRef, snapshot=>{
+            let messageDetails = snapshot.val();
+            let messageID = snapshot.key;
+            
+            commit('addMessages',{
+                messageID,
+                messageDetails
+            })
+        })
+    },
+    firebaseStopGettingMessages({ commit }){
+        if(messagesRef){
+            off(messagesRef)
+            commit('clearMessages')
+        }
+        
+    },
+    firebaseSendMessages({}, payload){
+        push(ref(db, 'chats/'+state.userDetails.userID+'/'+payload.otherUserID), payload.message)
+
+        payload.message.from = 'them'
+        push(ref(db, 'chats/'+payload.otherUserID+'/'+state.userDetails.userID), payload.message)
     }
 }
 
@@ -119,7 +156,7 @@ const getters = {
     users: state=>{
         let userFiltered ={};
         Object.keys(state.users).forEach(key=>{
-            if(key!== state.userDetails.userID){
+            if(key!== state.userDetails.userID && key !== 'undefined'){
                 userFiltered[key] = state.users[key]
             }
         })

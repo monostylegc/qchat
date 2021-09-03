@@ -3,7 +3,7 @@
     <q-header>
       <q-toolbar>
         <q-btn
-          v-if="$route.fullPath === '/chat'"
+          v-if="$route.fullPath.includes('/chat')"
           v-go-back.single
           icon="arrow_back"
           dense
@@ -42,10 +42,11 @@
 
 <script>
 import { mapState, mapActions } from "vuex";
+import mixinOtherUserDetails from "src/mixins/mixin-other-user-details";
 
 export default {
   name: "MainLayout",
-
+  mixins: [mixinOtherUserDetails],
   computed: {
     ...mapState("store", ["userDetails"]),
 
@@ -54,10 +55,9 @@ export default {
 
       if (currentPath === "/") {
         return "Q Chat";
-      } else if (currentPath === "/chat") {
-        return "Chat Page";
-      } else currentPath === "/auth";
-      return "Login";
+      } else if (currentPath.includes("/chat")) {
+        return this.otherUserDetails.name;
+      } else return "Login";
     }
   },
   data() {
